@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rvHeros;
     RvHerosAdapter herosAdapter;
     List<Character> listHeros = new ArrayList<>();
+    List<Character> listHerosFilter = new ArrayList<>();
     Retrofit retrofit;
     List<FragmentList> fragments = new ArrayList<FragmentList>();
     ImageButton buttonBack, buttonNext;
@@ -58,12 +59,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
+                if (!edtbusca.getText().equals("")) {
+                    listHerosFilter.clear();
+                    for (int i = 0; i < listHeros.size(); i++) {
+                        Character character = listHeros.get(i);
+                        if (character.getName().toLowerCase().startsWith(edtbusca.getText().toString().toLowerCase())) {
+                            listHerosFilter.add(character);
+                        }
+                    }
+
+                    setComponents(listHerosFilter);
+
+                } else {
+                    getApiResponse();
+                }
             }
+
 
             @Override
             public void afterTextChanged(Editable s) {
-
-
 
             }
         });
@@ -87,6 +101,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        getApiResponse();
+
+
+
+    }
+
+    public void getApiResponse(){
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://gateway.marvel.com:443/")
@@ -102,46 +123,62 @@ public class MainActivity extends AppCompatActivity {
         Call<ReturnData> call = herosServices.getHeros(ts,getString(R.string.public_Key),hash);
 
         call.enqueue(new Callback<ReturnData>() {
-                         @Override
-                         public void onResponse(Call<ReturnData> call, Response<ReturnData> response) {
-                             if (response.isSuccessful()){
+            @Override
+            public void onResponse(Call<ReturnData> call, Response<ReturnData> response) {
+                if (response.isSuccessful()){
 
-                                 Log.d("response", response.body().toString());
-                                 ReturnData data = response.body();
+                    Log.d("response", response.body().toString());
+                    ReturnData data = response.body();
 
-                                 Log.d("response",  data.data.results.get(1).getDescription());
-                                 listHeros = data.data.results;
+                    Log.d("response",  data.data.results.get(1).getDescription());
+                    listHeros = data.data.results;
+                    setComponents(listHeros);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReturnData> call, Throwable t) {
+                Log.d("Response", t.getMessage() );
+            }
+        });
+    }
+
+    public void setComponents(List<Character> listItems){
+        fragments.clear();
+        int countFragment = listItems.size() /4;
+        if (countFragment <= 0){
+            countFragment = listItems.size();
+        }
+
+        for (int i = 0; i < countFragment; i ++) {
+            FragmentList fragmentList = new FragmentList();
+            fragmentList.position = i;
 
 
-                                 for (int i = 0; i < listHeros.size()/4; i ++) {
-                                     FragmentList fragmentList = new FragmentList();
-                                     fragmentList.position = i;
+            int startCount = ((i+1) * 4) - 4;
 
-                                     int countlist = (i + 1) * 4;
-                                     int startCount = ((i+1) * 4) - 4;
+            if (startCount < 0){
+                startCount = 0;
+            }
 
-                                     if (startCount < 0){
-                                         startCount = 0;
-                                     }
-                                     for (int j = startCount; j < countlist; j++ ){
-                                         fragmentList.list.add(listHeros.get(j));
-                                     }
-                                     fragments.add(fragmentList);
-                                 }
+            int endCount = startCount + 4;
+            if (endCount > listItems.size()){
+                endCount = listItems.size();
+            }
+            for (int j = startCount; j < endCount; j++ ){
+                fragmentList.list.add(listItems.get(j));
+            }
+            fragments.add(fragmentList);
+        }
+        if (fragments.size() == 0){
+            FragmentList fragmentList = new FragmentList();
+            fragments.add(fragmentList);
+        }
 
-                                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                 FragmentList fragmentList = fragments.get(0);
-                                 transaction.replace(R.id.frameLayoutFragment,fragmentList );
-                                 transaction.commit();
-                             }
-                         }
-
-                         @Override
-                         public void onFailure(Call<ReturnData> call, Throwable t) {
-                            Log.d("Response", t.getMessage() );
-                         }
-                     });
-
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentList fragmentList = fragments.get(0);
+        transaction.replace(R.id.frameLayoutFragment,fragmentList );
+        transaction.commit();
     }
 
 

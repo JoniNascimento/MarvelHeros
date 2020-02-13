@@ -15,12 +15,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.Serializable;
 import java.util.List;
 
-import br.com.joni.marvelheros.Activity.HeroDetailActivity;
 import br.com.joni.marvelheros.Model.Character;
 import br.com.joni.marvelheros.R;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RvHerosAdapter extends RecyclerView.Adapter<RvHerosAdapter.HerosVH> {
 
@@ -46,17 +45,17 @@ public class RvHerosAdapter extends RecyclerView.Adapter<RvHerosAdapter.HerosVH>
     @Override
     public void onBindViewHolder(@NonNull HerosVH herosVH, int i) {
             Character hero = listHeros.get(i);
-            String pictureUrl = hero.getThumbnail().getPath() + "." + hero.getThumbnail().getExtension();
+            String pictureUrl = hero.getThumbnail().getPath() + "/standard_medium." + hero.getThumbnail().getExtension();
             Log.d("imageURL", pictureUrl);
             herosVH.heroName.setText(hero.getName());
             if (pictureUrl != "") {
-                Picasso.get().load(pictureUrl).resize(70, 70).into(herosVH.heroPicture);
+                Picasso.with(this.context).load(pictureUrl).into(herosVH.heroPicture);
             }
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        return listHeros.size();
     }
 
     public void setOnItemClickListener(HerosVH.ItemClickListener itemClickListener){
@@ -69,7 +68,7 @@ public class RvHerosAdapter extends RecyclerView.Adapter<RvHerosAdapter.HerosVH>
     public static class HerosVH extends  RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView heroName;
-        ImageView heroPicture;
+        CircleImageView heroPicture;
 
 
         public HerosVH(@NonNull View itemView) {
