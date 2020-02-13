@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MarvelHeros</string>
+    <string name="public_Key">48bbc34d1a74e687b9745a3bca9abe7b</string>
+    <string name="private_key">32e943c5a98f8e70b78b7fdb02ba5153ca84339f</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
