@@ -1,15 +1,20 @@
 package br.com.joni.marvelheros.Activity;
 
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -19,6 +24,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.joni.marvelheros.Adapter.RvButtonAdapter;
 import br.com.joni.marvelheros.Adapter.RvHerosAdapter;
 import br.com.joni.marvelheros.Api.HerosServices;
 import br.com.joni.marvelheros.Fragment.FragmentList;
@@ -41,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
     List<FragmentList> fragments = new ArrayList<FragmentList>();
     ImageButton buttonBack, buttonNext;
     EditText edtbusca;
+    RecyclerView rvButtons;
+    List<Button> listButtonPage = new ArrayList<Button>();
+    RvButtonAdapter rvButtonAdapter;
+    LinearLayoutManager layoutManager;
 
 
 
@@ -143,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("ResourceAsColor")
     public void setComponents(List<Character> listItems){
         fragments.clear();
         int countFragment = listItems.size() /4;
@@ -168,17 +179,44 @@ public class MainActivity extends AppCompatActivity {
             for (int j = startCount; j < endCount; j++ ){
                 fragmentList.list.add(listItems.get(j));
             }
+            Button button = new Button(this);
+            if (i == 0) {
+                button.setSelected(true);
+            }
+
+            listButtonPage.add(button);
             fragments.add(fragmentList);
         }
         if (fragments.size() == 0){
             FragmentList fragmentList = new FragmentList();
             fragments.add(fragmentList);
+            Button button = new Button(this);
+            button.setSelected(true);
+            listButtonPage.add(button);
         }
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         FragmentList fragmentList = fragments.get(0);
         transaction.replace(R.id.frameLayoutFragment,fragmentList );
         transaction.commit();
+
+        rvButtons = (RecyclerView) findViewById(R.id.rvButtonsPage);
+
+        rvButtonAdapter = new RvButtonAdapter(this,listButtonPage);
+
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        rvButtons.setLayoutManager(layoutManager);
+        rvButtons.setHasFixedSize(true);
+
+        rvButtonAdapter.setOnItemClickListener(new RvButtonAdapter.HolderButton.ItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                changeFragmentIndex(position);
+            }
+        });
+
+        rvButtons.setAdapter(rvButtonAdapter);
+
     }
 
 
@@ -192,9 +230,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeFragment(boolean next){
+        int position = getCurrentFragment(next);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        FragmentList fragmentList = fragments.get(position);
+        transaction.replace(R.id.frameLayoutFragment,fragmentList );
+        transaction.commit();
+        rvButtons.scrollToPosition(position);
+
+    }
+
+    public void changeFragmentIndex(int index){
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        FragmentList fragmentList = fragments.get(getCurrentFragment(next));
+        FragmentList fragmentList = fragments.get(index);
         transaction.replace(R.id.frameLayoutFragment,fragmentList );
         transaction.commit();
     }

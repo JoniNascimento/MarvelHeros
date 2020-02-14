@@ -32,9 +32,9 @@ public class HeroDetailActivity extends AppCompatActivity {
         tvModified = (TextView) findViewById(R.id.tvModified);
 
         Picasso.with(this).load(character.getThumbnail().getPath()+"/standard_medium."+character.getThumbnail().getExtension()).into(ivHero);
-        tvName.setText(character.getName());
-        tvDescription.setText(character.getDescription());
-        tvModified.setText(character.getModified());
+        tvName.setText("Nome: " + character.getName());
+        tvDescription.setText("Descrição: " + character.getDescription());
+        tvModified.setText("Modificado em: " + character.getModified());
 
 
     }

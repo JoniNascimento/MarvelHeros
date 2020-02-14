@@ -27,7 +27,14 @@
             android:layout_height="50dp"
             android:layout_weight="5"
             android:layout_marginBottom="24dp"
-            android:layout_marginTop="18dp"/>
+            android:layout_marginTop="18dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvButtonsPage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"/>
+        </LinearLayout>
 
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/btnNext"

@@ -37,7 +37,7 @@
 
 </LinearLayout>
     <include layout="@layout/divider"
-        android:layout_width="63dp"
+        android:layout_width="60dp"
         android:layout_height="3dp"
         android:layout_marginLeft="45dp"/>
 
